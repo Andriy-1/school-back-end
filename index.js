@@ -1,24 +1,17 @@
 import express from "express"
 import mongoose from "mongoose"
-//import config from './config.json';
-import Post from './Post.js'
+import config from './config/default.json' assert {type: 'json'};
+import postRouter from "./Router/post.routers.js";
 
-const DB_URl = "mongodb+srv://School:School1223@textbooks.phq64kn.mongodb.net/?retryWrites=true&w=majority";
 const app = express();
 
-const PORT = 5001;
+const PORT = config.PORT;
 app.use(express.json());
-
-
-app.post('/', async (req, res) => {
-	const { classNumber, title, author } = req.body;
-	const post = await Post.create({ classNumber, title, author })
-	res.json(post)
-})
+app.use('/api', postRouter)
 
 const startApp = async () => {
 	try {
-		await mongoose.connect(DB_URl, {
+		await mongoose.connect(config.dburl, {
 			useNewUrlParser: true,
 			useUnifiedTopology: true
 		})
