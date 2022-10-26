@@ -2,16 +2,20 @@ import express from "express"
 import mongoose from "mongoose"
 import config from './config/default.json' assert {type: 'json'};
 import postRouter from "./Router/post.routers.js";
-
+import cors from "cors"
 const app = express();
+const { PORT, dburl } = config;
+app.use(cors({
+	origin: ["http://localhost:3000"],
+	credentials: true
+}))
 
-const PORT = config.PORT;
 app.use(express.json());
 app.use('/api', postRouter)
 
 const startApp = async () => {
 	try {
-		await mongoose.connect(config.dburl, {
+		await mongoose.connect(dburl, {
 			useNewUrlParser: true,
 			useUnifiedTopology: true
 		})
