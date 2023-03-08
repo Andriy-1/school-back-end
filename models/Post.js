@@ -1,0 +1,34 @@
+import mongoose from 'mongoose';
+
+const PostSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    text: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    viewsCount: {
+      type: Number,
+      default: 0,
+    },
+    likeCount: {
+      type: Number,
+      default: 0,
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Auth',
+      required: true,
+    },
+    imageUrl: String,
+  },
+  {
+    timestamps: true,
+  },
+);
+
+export default mongoose.model('Post', PostSchema);
