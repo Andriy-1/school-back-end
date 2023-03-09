@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import postRouter from './router/post.routers.js';
 import authRouter from './router/auth.routers.js';
 import uploadRouter from './router/upload.routers.js';
+import userRouter from './router/user.routers.js';
 
 mongoose
 	.set("strictQuery", false)
@@ -20,6 +21,7 @@ app.use('/uploads', express.static('uploads'));
 
 app.use('/api', authRouter);
 app.use('/api', postRouter);
+app.use('/api', userRouter);
 app.use('/api', uploadRouter);
 
 app.listen(4444, (err) => {

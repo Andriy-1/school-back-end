@@ -15,6 +15,9 @@ export const registerValidation = [
 export const postCreateValidation = [
 	body('title', 'Введіть заголовок статті').isLength({ min: 3 }).isString(),
 	body('text', 'Введіть текст статті').isLength({ min: 3 }).isString(),
-	// body('tags', 'Некоректний формат тегів').optional().isString(),
 	body('imageUrl', 'Невірна ссилка на зображення').optional().isString(),
+];
+export const userCreateValidation = [
+	body('fullName', 'Введіть ПІБ').isLength({ min: 3 }).isString(),
+	body('position', 'Введіть посаду').isLength({ min: 3 }).isString(),
 ];
