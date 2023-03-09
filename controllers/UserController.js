@@ -1,13 +1,15 @@
 import UserModel from '../models/User.js';
+import { saveFile } from '../services/fileService.js';
 
 
 export const createUser = async (req, res) => {
 	try {
+		const fileName = saveFile(req.files.imageUrl)
 		const doc = new UserModel({
 			fullName: req.body.fullName,
 			position: req.body.position,
 			description: req.body.description,
-			imageUrl: req.body.imageUrl,
+			imageUrl: fileName,
 		});
 
 		const user = await doc.save();
