@@ -1,20 +1,18 @@
 import UserModel from '../models/User.js';
-import { saveFile } from '../services/fileService.js';
+import { deleteFile, saveFile } from '../services/fileService.js';
 
 
 export const createUser = async (req, res) => {
 	try {
-		const fileName = saveFile(req.files.imageUrl)
+		const fileName = saveFile(req.files.image)
 		const doc = new UserModel({
 			fullName: req.body.fullName,
 			position: req.body.position,
 			description: req.body.description,
 			imageUrl: fileName,
 		});
-
 		const user = await doc.save();
 		console.log(user);
-
 		res.json({ success: true, user });
 	} catch (err) {
 		console.log(err);
@@ -24,9 +22,9 @@ export const createUser = async (req, res) => {
 	}
 };
 
+
 export const getAllUsers = async (req, res) => {
 	try {
-
 		const users = await UserModel.find().populate('fullName').exec();
 		res.json(users);
 	} catch (err) {
@@ -37,11 +35,13 @@ export const getAllUsers = async (req, res) => {
 	}
 };
 
-
 export const removeUsers = async (req, res) => {
 	try {
 		const userId = req.params.id;
-
+		const users = await UserModel.findById(userId).exec();
+		if (users.imageUrl) {
+			deleteFile(users.imageUrl)
+		}
 		UserModel.findOneAndDelete(
 			{
 				_id: userId,
@@ -72,30 +72,3 @@ export const removeUsers = async (req, res) => {
 		});
 	}
 };
-
-// export const update = async (req, res) => {
-// 	try {
-// 		const postId = req.params.id;
-
-// 		await PostModel.updateOne(
-// 			{
-// 				_id: postId,
-// 			},
-// 			{
-// 				title: req.body.title,
-// 				text: req.body.text,
-// 				imageUrl: req.body.imageUrl,
-// 				user: req.userId,
-// 			},
-// 		);
-
-// 		res.json({
-// 			success: true,
-// 		});
-// 	} catch (err) {
-// 		console.log(err);
-// 		res.status(500).json({
-// 			message: 'Не вдалося обновити статтю',
-// 		});
-// 	}
-// };

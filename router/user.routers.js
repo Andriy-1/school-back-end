@@ -7,7 +7,8 @@ import { userCreateValidation } from "../validations.js";
 const userRouter = new Router;
 
 userRouter.get('/about/user', UserController.getAllUsers);
-userRouter.post('/about/user', userCreateValidation, handleValidationErrors, UserController.createUser);
+userRouter.post('/about/user', checkAuth, userCreateValidation, handleValidationErrors, UserController.createUser);
 userRouter.delete('/about/user/:id', checkAuth, UserController.removeUsers);
 
 export default userRouter;
+

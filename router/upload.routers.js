@@ -5,10 +5,10 @@ import fs from 'fs';
 import { AuthController } from "../controllers/index.js";
 import { checkAuth, handleValidationErrors } from "../utils/index.js";
 import { loginValidation, registerValidation } from "../validations.js";
+// import { upload } from "../index.js";
 
 
 const uploadRouter = new Router;
-
 const storage = multer.diskStorage({
 	destination: (_, __, cb) => {
 		if (!fs.existsSync('uploads')) {
@@ -20,9 +20,9 @@ const storage = multer.diskStorage({
 		cb(null, file.originalname);
 	},
 });
-const upload = multer({ storage });
 
-uploadRouter.post('/upload', checkAuth, upload.single('image'), (req, res) => {
+const upload = multer({ storage });
+uploadRouter.post('/upload', upload.single('image'), (req, res) => {
 	res.json({
 		url: `/uploads/${req.file.originalname}`,
 	});
