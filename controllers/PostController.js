@@ -2,9 +2,8 @@ import PostModel from '../models/Post.js';
 
 export const getAll = async (req, res) => {
 	try {
-
-		const posts = await PostModel.find().populate('user').exec();
-		res.json(posts);
+		const resPosts= await db.query(`SELECT * FROM posts`);
+		res.json(resPosts.rows);
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -68,30 +67,25 @@ export const getOne = async (req, res) => {
 export const remove = async (req, res) => {
 	try {
 		const postId = req.params.id;
+		const resPost = await db.query(`DELETE FROM posts WHERE id = $1 `, [postId]);
 
-		PostModel.findOneAndDelete(
-			{
-				_id: postId,
-			},
-			(err, doc) => {
-				if (err) {
-					console.log(err);
-					return res.status(500).json({
-						message: 'Не вдалося видалити статті',
-					});
-				}
-
-				if (!doc) {
-					return res.status(404).json({
-						message: 'Стаття не знайдена',
-					});
-				}
-
-				res.json({
-					success: true,
+		const valid = (err, doc) => {
+			if (err) {
+				console.log(err);
+				return res.status(500).json({
+					message: 'Не вдалося видалити статтю',
 				});
-			},
-		);
+			}
+
+			if (!doc) {
+				return res.status(404).json({
+					message: 'Статті не знайдено',
+				});
+			}
+		}
+		return [valid, res.json({
+			success: true,
+		})]
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({

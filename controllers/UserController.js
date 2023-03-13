@@ -1,19 +1,14 @@
-import UserModel from '../models/User.js';
 import { deleteFile, saveFile } from '../services/fileService.js';
-
+import db from '../db/connect.js';
 
 export const createUser = async (req, res) => {
 	try {
-		const fileName = saveFile(req.files.image)
-		const doc = new UserModel({
-			fullName: req.body.fullName,
-			position: req.body.position,
-			description: req.body.description,
-			imageUrl: fileName,
-		});
-		const user = await doc.save();
-		console.log(user);
-		res.json({ success: true, user });
+		const fileName = saveFile(req.files.imageUrl)
+		const { fullName, position, description } = req.body;
+		const newUser = await db.query(`INSERT INTO users ("fullName", "position", "description", "imageUrl") values ($1, $2, $3, $4) RETURNING *`, [fullName, position, description, fileName]);
+		const user = newUser.rows[0];
+
+		res.json({ success: true, ...user });
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -21,12 +16,10 @@ export const createUser = async (req, res) => {
 		});
 	}
 };
-
-
 export const getAllUsers = async (req, res) => {
 	try {
-		const users = await UserModel.find().populate('fullName').exec();
-		res.json(users);
+		const resUsers = await db.query(`SELECT * FROM users`);
+		res.json(resUsers.rows);
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -34,37 +27,34 @@ export const getAllUsers = async (req, res) => {
 		});
 	}
 };
-
 export const removeUsers = async (req, res) => {
 	try {
 		const userId = req.params.id;
-		const users = await UserModel.findById(userId).exec();
-		if (users.imageUrl) {
-			deleteFile(users.imageUrl)
+		const resUser = await db.query(`DELETE FROM users WHERE id = $1 RETURNING *`, [userId]);
+		const user = resUser.rows[0];
+
+		if (user.imageUrl) {
+			deleteFile(user.imageUrl)
 		}
-		UserModel.findOneAndDelete(
-			{
-				_id: userId,
-			},
-			(err, doc) => {
-				if (err) {
-					console.log(err);
-					return res.status(500).json({
-						message: 'Не вдалося видалити статті',
-					});
-				}
 
-				if (!doc) {
-					return res.status(404).json({
-						message: 'Стаття не знайдена',
-					});
-				}
-
-				res.json({
-					success: true,
+		const valid = (err, doc) => {
+			if (err) {
+				console.log(err);
+				return res.status(500).json({
+					message: 'Не вдалося видалити користувача',
 				});
-			},
-		);
+			}
+
+			if (!doc) {
+				return res.status(404).json({
+					message: 'Користувач не знайдена',
+				});
+			}
+		}
+		return [valid, res.json({
+			success: true,
+			message: 'Користувач видалений',
+		})]
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
