@@ -9,12 +9,12 @@ import authRouter from './router/auth.routers.js';
 import userRouter from './router/user.routers.js';
 import fileUpload from 'express-fileupload';
 
-mongoose
-	.set("strictQuery", false)
-	.connect("mongodb+srv://school-admin:school@cluster0.nl2vlfz.mongodb.net/school?retryWrites=true&w=majority")
-	.then(() => console.log('DB ok'))
-	.catch((err) => console.log('DB error', err));
-
+// mongoose
+// 	.set("strictQuery", false)
+// 	.connect("mongodb+srv://school-admin:school@cluster0.nl2vlfz.mongodb.net/school?retryWrites=true&w=majority")
+// 	.then(() => console.log('DB ok'))
+// 	.catch((err) => console.log('DB error', err));
+mongodb://<username>:<password>@cluster0-shard-00-00-zcbag.mongodb.net:27017,cluster0-shard-00-01-zcbag.mongodb.net:27017,cluster0-shard-00-02-xvnqv.mongodb.net:27017/zcbag?ssl=true&replicaSet=Cluster0-shard-0&authSource=test&retryWrites=true&w=majority
 const app = express();
 
 app.use(express.json());
@@ -25,6 +25,7 @@ app.use(express.static('static/users'));
 app.use('/api', authRouter);
 app.use('/api', postRouter);
 app.use('/api', userRouter);
+
 
 // const storage = multer.diskStorage({
 // 	destination: (_, __, cb) => {

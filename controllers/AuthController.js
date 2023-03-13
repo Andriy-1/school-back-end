@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
 import AuthModel from '../models/Auth.js';
+// import db from '../db/connect.js';
 
 export const register = async (req, res) => {
 	try {
@@ -9,33 +10,36 @@ export const register = async (req, res) => {
 		const salt = await bcrypt.genSalt(10);
 		const hash = await bcrypt.hash(password, salt);
 		console.log(res.body);
+		const { fullName, email } = req.body;
+		
+		// const newAuthUser = await db.query(`INSERT INTO auth (fullName, email, passwordHash) values ($1, $2, $3) RETURNING *`, [fullName, email, hash]);
+		// const auth = newAuthUser.rows[0];
+		// const doc = new AuthModel({
+		// 	email: req.body.email,
+		// 	fullName: req.body.fullName,
+		// 	avatarUrl: req.body.avatarUrl,
+		// 	passwordHash: hash,
+		// });
+		// console.log(doc);
 
-		const doc = new AuthModel({
-			email: req.body.email,
-			fullName: req.body.fullName,
-			avatarUrl: req.body.avatarUrl,
-			passwordHash: hash,
-		});
-		console.log(doc);
+		// const user = await doc.save();
 
-		const user = await doc.save();
+		// const token = jwt.sign(
+		// 	{
+		// 		_id: auth._id,
+		// 	},
+		// 	'secret123',
+		// 	{
+		// 		expiresIn: '30d',
+		// 	},
+		// );
 
-		const token = jwt.sign(
-			{
-				_id: user._id,
-			},
-			'secret123',
-			{
-				expiresIn: '30d',
-			},
-		);
-
-		const { passwordHash, ...userData } = user._doc;
+		// const { passwordHash, ...userData } = user._doc;
 
 		res.json({
 			success: true,
-			...userData,
-			token
+			auth,
+			// token
 		});
 	} catch (err) {
 		console.log(err);
