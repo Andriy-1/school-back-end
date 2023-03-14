@@ -13,6 +13,6 @@ pool.connect(error => {
 		process.exit(1);
 	}
 });
-console.log('PSQL OK');
+console.log('DB OK');
 
 export default pool;
