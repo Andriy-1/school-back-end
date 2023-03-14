@@ -6,7 +6,7 @@ import db from '../db/connect.js';
 export const register = async (req, res) => {
 	try {
 		const password = req.body.password;
-		const salt = await bcrypt.genSalt(10);1
+		const salt = await bcrypt.genSalt(10);
 		const hash = await bcrypt.hash(password, salt);
 		const { fullName, email } = req.body;
 		const newAuthUser = await db.query(`INSERT INTO auth ("fullName", email, "passwordHash") values ($1, $2, $3) RETURNING *`, [fullName, email, hash]);
@@ -36,9 +36,9 @@ export const login = async (req, res) => {
 	try {
 		const resAuthData = await db.query(`SELECT * FROM auth WHERE email = $1`, [req.body.email]);
 		const user = resAuthData.rows[0];
-		
+
 		console.log(user);
-		
+
 		if (!user) {
 			return res.status(404).json({
 				message: 'Невірний логін або пароль',
@@ -76,12 +76,15 @@ export const login = async (req, res) => {
 
 export const getMe = async (req, res) => {
 	try {
-		const id = req.params.id
-		const allAuthUser = await db.query(`SELECT * FROM auth WHERE id = $1`, [1]);
-		const dataUser = allAuthUser.rows[0];
-		console.log(dataUser);
-
-		res.json(dataUser);
+		const allAuthUser = await db.query(`SELECT * FROM auth WHERE id = $1`, [req.userId]);
+		const auth = allAuthUser.rows[0];
+		console.log(auth);
+		if (!auth) {
+			return res.status(404).json({
+				message: 'Користувача не знайдено',
+			});
+		}
+		res.json(auth);
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
