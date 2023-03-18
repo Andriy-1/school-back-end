@@ -1,10 +1,11 @@
 import PostModel from '../models/Post.js';
 import db from '../db/connect.js';
+import { deleteFilePost, saveFilePost } from '../services/fileService.js';
 
 export const getAll = async (req, res) => {
 	try {
 		const resPosts = await db.query(`SELECT * FROM posts`);
-		res.json(resPosts.rows);
+		res.json(resPosts.rows.reverse());
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -16,7 +17,7 @@ export const getAll = async (req, res) => {
 export const getThree = async (req, res) => {
 	try {
 		const posts = await db.query(`SELECT * FROM posts ORDER BY id LIMIT 3`);
-		res.json(posts.rows);
+		res.json(posts.rows.reverse());
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -67,7 +68,7 @@ export const remove = async (req, res) => {
 	try {
 		const postId = req.params.id;
 		const resPost = await db.query(`DELETE FROM posts WHERE id = $1 `, [postId]);
-
+		const post = resPost.rows[0];
 		const valid = (err, doc) => {
 			if (err) {
 				console.log(err);
@@ -81,6 +82,9 @@ export const remove = async (req, res) => {
 					message: 'Статті не знайдено',
 				});
 			}
+		}
+		if (post.imageUrl) {
+			deleteFilePost(post.imageUrl)
 		}
 		return [valid, res.json({
 			success: true,
@@ -96,7 +100,10 @@ export const remove = async (req, res) => {
 export const create = async (req, res) => {
 	try {
 		const { title, text, imageUrl } = req.body;
-		const newPost = await db.query(`INSERT INTO posts (title, text, "imageUrl", user_id) values ($1, $2, $3, $4) RETURNING *`, [title, text, imageUrl, req.userId]);
+		const fileName = saveFilePost(req.files.image)
+		console.log(fileName);
+
+		const newPost = await db.query(`INSERT INTO posts (title, text, "imageUrl", user_id) values ($1, $2, $3, $4) RETURNING *`, [title, text, fileName, req.userId]);
 		const post = newPost.rows[0];
 		console.log(post);
 
@@ -114,7 +121,7 @@ export const update = async (req, res) => {
 		const postId = req.params.id;
 		const { title, text, imageUrl } = req.body;
 		const upadatePost =
-		await db.query(`UPDATE posts 
+			await db.query(`UPDATE posts 
 		SET title = $1, text = $2, "imageUrl" = $3, user_id = $4
 		WHERE id =$5
 		RETURNING *`, [title, text, imageUrl, req.userId, postId]);

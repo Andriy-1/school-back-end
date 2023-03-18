@@ -13,6 +13,7 @@ app.use(express.json());
 app.use(fileUpload({}));
 app.use(cors());
 app.use(express.static('static/users'));
+app.use(express.static('static/posts'));
 
 app.use('/api', authRouter);
 app.use('/api', postRouter);
