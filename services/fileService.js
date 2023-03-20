@@ -50,3 +50,27 @@ export const deleteFilePost = (fileName) => {
 		console.log('File delete success');
 	})
 }
+
+export const saveFileDoc = (file) => {
+	try {
+		const fileName = uuid.v4() + '.pdf';
+		const filePath = path.resolve('static/doc', fileName);
+		console.log(filePath);
+		file.mv(filePath);
+		return fileName;
+	} catch (error) {
+		console.log(error);
+
+	}
+}
+
+export const deleteFileDoc = (fileName) => {
+	const filePath = path.resolve('static/doc', fileName);
+	fs.unlink(filePath, (err) => {
+		if (err) {
+			console.log(err);
+			return
+		}
+		console.log('File delete success');
+	})
+}

@@ -25,3 +25,9 @@ create TABLE post(
 	user_id INTEGER,
 	FOREIGN KEY (user_id) REFERENCES auth (id)
 );
+
+create TABLE document(
+	id SERIAL PRIMARY KEY,
+	title VARCHAR(255) NOT NULL,
+	"file" VARCHAR(255) NOT NULL
+);

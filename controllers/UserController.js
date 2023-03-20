@@ -12,7 +12,7 @@ export const createUser = async (req, res) => {
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
-			message: 'Не вдалося створити статтю',
+			message: 'Не вдалося створити користувача',
 		});
 	}
 };
@@ -29,16 +29,12 @@ export const getAllUsers = async (req, res) => {
 };
 export const removeUsers = async (req, res) => {
 	try {
-		console.log('req.params.id',req.params);
-		console.log('req.body',req.body);
-		
+		console.log('req.params.id', req.params);
+		console.log('req.body', req.body);
+
 		const userId = req.params.id;
 		const resUser = await db.query(`DELETE FROM users WHERE id = $1 RETURNING *`, [userId]);
 		const user = resUser.rows[0];
-
-		if (user.imageUrl) {
-			deleteFile(user.imageUrl)
-		}
 
 		const valid = (err, doc) => {
 			if (err) {
@@ -53,6 +49,9 @@ export const removeUsers = async (req, res) => {
 					message: 'Користувач не знайдена',
 				});
 			}
+		}
+		if (user.imageUrl) {
+			deleteFile(user.imageUrl)
 		}
 		return [valid, res.json({
 			success: true,

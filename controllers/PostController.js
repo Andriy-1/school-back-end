@@ -66,9 +66,12 @@ export const getThree = async (req, res) => {
 
 export const remove = async (req, res) => {
 	try {
+
+
 		const postId = req.params.id;
-		const resPost = await db.query(`DELETE FROM posts WHERE id = $1 `, [postId]);
+		const resPost = await db.query(`DELETE FROM posts WHERE id = $1 RETURNING *`, [postId]);
 		const post = resPost.rows[0];
+
 		const valid = (err, doc) => {
 			if (err) {
 				console.log(err);
@@ -86,6 +89,7 @@ export const remove = async (req, res) => {
 		if (post.imageUrl) {
 			deleteFilePost(post.imageUrl)
 		}
+
 		return [valid, res.json({
 			success: true,
 		})]
