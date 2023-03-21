@@ -1,29 +1,53 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-
 import db from '../db/connect.js';
+import * as dotenv from 'dotenv';
+dotenv.config()
+// import nodemailer from 'nodemailer';
+// const transporter = nodemailer.createTransport({
+// 	service: 'gmail',
+// 	auth: {
+// 		user: process.env.EMAIL,
+// 		pass: process.env.PASSWORD
+
+// 	}
+// })
+// const mailOptions = {
+// 	from: 'Коп.Гімназія  <prob.robota@gmail.com>',
+// 	to: req.body.email,
+// 	subject: 'Код для авторизація на сайті школи',
+// 	html: '<h1>Код: 112233</h1>',
+// }
+// transporter.sendMail(mailOptions, err => console.log(err));
+
 
 export const register = async (req, res) => {
 	try {
-		const password = req.body.password;
-		const salt = await bcrypt.genSalt(10);
-		const hash = await bcrypt.hash(password, salt);
-		const { fullName, email } = req.body;
-		const newAuthUser = await db.query(`INSERT INTO auth ("fullName", email, "passwordHash") values ($1, $2, $3) RETURNING *`, [fullName, email, hash]);
-		const auth = newAuthUser.rows[0];
-		console.log(auth);
+		const key = req.body.key;
+		if (key === process.env.KEY) {
+			const password = req.body.password;
+			const salt = await bcrypt.genSalt(10);
+			const hash = await bcrypt.hash(password, salt);
+			const { fullName, email } = req.body;
+			const newAuthUser = await db.query(`INSERT INTO auth ("fullName", email, "passwordHash") values ($1, $2, $3) RETURNING *`, [fullName, email, hash]);
+			const auth = newAuthUser.rows[0];
+			console.log(auth);
 
-		const token = jwt.sign(
-			{
-				_id: auth.id,
-			},
-			'secret123',
-			{
-				expiresIn: '30d',
-			},
-		);
-
-		res.json({ success: true, auth, token });
+			const token = jwt.sign(
+				{
+					_id: auth.id,
+				},
+				'secret123',
+				{
+					expiresIn: '5d',
+				},
+			);
+			res.json({ success: true, auth, token });
+		} else {
+			res.status(406).json({
+				message: 'Щось пішло не так. Перевірьте чи всі дані уведені вірно. Можливо якесь поле ненадане.',
+			})
+		}
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -34,6 +58,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
 	try {
+
 		const resAuthData = await db.query(`SELECT * FROM auth WHERE email = $1`, [req.body.email]);
 		const user = resAuthData.rows[0];
 
@@ -58,7 +83,7 @@ export const login = async (req, res) => {
 			},
 			'secret123',
 			{
-				expiresIn: '30d',
+				expiresIn: '5d',
 			},
 		);
 

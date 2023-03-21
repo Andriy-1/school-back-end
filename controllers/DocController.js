@@ -18,7 +18,7 @@ export const createDoc = async (req, res) => {
 export const getAllDoc = async (req, res) => {
 	try {
 		const resDoc = await db.query(`SELECT * FROM document`);
-		res.json(resDoc.rows);
+		res.json(resDoc.rows.reverse());
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
