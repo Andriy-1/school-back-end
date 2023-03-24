@@ -31,3 +31,15 @@ create TABLE document(
 	title VARCHAR(255) NOT NULL,
 	"file" VARCHAR(255) NOT NULL
 );
+
+create TABLE document_timetable(
+	id SERIAL PRIMARY KEY,
+	title VARCHAR(255) NOT NULL,
+	"file" VARCHAR(255) NOT NULL
+);
+
+create TABLE document_circle(
+	id SERIAL PRIMARY KEY,
+	title VARCHAR(255) NOT NULL,
+	"file" VARCHAR(255) NOT NULL
+);

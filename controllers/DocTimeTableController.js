@@ -3,9 +3,9 @@ import db from '../db/connect.js';
 
 export const createDoc = async (req, res) => {
 	try {
-		const fileName = saveFileDoc(req.files.file, 'static/doc')
-		const { title } = req.body;
-		const newFile = await db.query(`INSERT INTO document ("title", "file") values ($1, $2) RETURNING *`, [title, fileName]);
+		const fileName = saveFileDoc(req.files.file, 'static/doc/timeTable')
+		const { title, seniors } = req.body;
+		const newFile = await db.query(`INSERT INTO document_timetable ("title", "file","seniors") values ($1, $2,$3) RETURNING *`, [title, fileName, seniors]);
 		const file = newFile.rows[0];
 		res.json({ success: true, ...file });
 	} catch (err) {
@@ -17,7 +17,7 @@ export const createDoc = async (req, res) => {
 };
 export const getAllDoc = async (req, res) => {
 	try {
-		const resDoc = await db.query(`SELECT * FROM document`);
+		const resDoc = await db.query(`SELECT * FROM document_timetable`);
 		res.json(resDoc.rows.reverse());
 	} catch (err) {
 		console.log(err);
@@ -29,7 +29,7 @@ export const getAllDoc = async (req, res) => {
 export const removeDoc = async (req, res) => {
 	try {
 		const userId = req.params.id;
-		const resDoc = await db.query(`DELETE FROM document WHERE id = $1 RETURNING *`, [userId]);
+		const resDoc = await db.query(`DELETE FROM document_timetable WHERE id = $1 RETURNING *`, [userId]);
 		const document = resDoc.rows[0];
 
 		const valid = (err, doc) => {
@@ -47,7 +47,7 @@ export const removeDoc = async (req, res) => {
 			}
 		}
 		if (document.file) {
-			deleteFileDoc(document.file, 'static/doc')
+			deleteFileDoc(document.file, 'static/doc/timeTable')
 		}
 		return [valid, res.json({
 			success: true,

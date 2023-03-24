@@ -51,10 +51,10 @@ export const deleteFilePost = (fileName) => {
 	})
 }
 
-export const saveFileDoc = (file) => {
+export const saveFileDoc = (file,pathFile) => {
 	try {
 		const fileName = uuid.v4() + '.pdf';
-		const filePath = path.resolve('static/doc', fileName);
+		const filePath = path.resolve(pathFile, fileName);
 		console.log(filePath);
 		file.mv(filePath);
 		return fileName;
@@ -64,8 +64,8 @@ export const saveFileDoc = (file) => {
 	}
 }
 
-export const deleteFileDoc = (fileName) => {
-	const filePath = path.resolve('static/doc', fileName);
+export const deleteFileDoc = (fileName,pathFile) => {
+	const filePath = path.resolve(pathFile, fileName);
 	fs.unlink(filePath, (err) => {
 		if (err) {
 			console.log(err);

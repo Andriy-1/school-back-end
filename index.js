@@ -7,6 +7,7 @@ import authRouter from './router/auth.routers.js';
 import userRouter from './router/user.routers.js';
 import fileUpload from 'express-fileupload';
 import docRouter from './router/document.routers.js';
+import docTimeTableRouter from './router/documentTimeTable.routers.js';
 
 const app = express();
 
@@ -16,11 +17,14 @@ app.use(cors());
 app.use(express.static('static/users'));
 app.use(express.static('static/posts'));
 app.use(express.static('static/doc'));
+app.use(express.static('static/doc/timeTable'));
+app.use(express.static('static/doc/circle'));
 
 app.use('/api', authRouter);
 app.use('/api', postRouter);
 app.use('/api', userRouter);
 app.use('/api', docRouter);
+app.use('/api', docTimeTableRouter);
 
 
 app.listen(4444, (err) => {
