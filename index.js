@@ -8,6 +8,7 @@ import userRouter from './router/user.routers.js';
 import fileUpload from 'express-fileupload';
 import docRouter from './router/document.routers.js';
 import docTimeTableRouter from './router/documentTimeTable.routers.js';
+import docCircleRouter from './router/documentCircle.routers.js';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api', postRouter);
 app.use('/api', userRouter);
 app.use('/api', docRouter);
 app.use('/api', docTimeTableRouter);
+app.use('/api', docCircleRouter);
 
 
 app.listen(4444, (err) => {
