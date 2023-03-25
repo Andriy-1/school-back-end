@@ -3,10 +3,10 @@ import * as path from 'path';
 import fs from 'fs';
 
 
-export const saveFile = (file) => {
+export const saveFile = (file, pathFile) => {
 	try {
 		const fileName = uuid.v4() + '.jpg';
-		const filePath = path.resolve('static/users', fileName);
+		const filePath = path.resolve(pathFile, fileName);
 		console.log(filePath);
 		file.mv(filePath);
 		return fileName;
@@ -16,8 +16,8 @@ export const saveFile = (file) => {
 	}
 }
 
-export const deleteFile = (fileName) => {
-	const filePath = path.resolve('static/users', fileName);
+export const deleteFile = (fileName, pathFile) => {
+	const filePath = path.resolve(pathFile, fileName);
 	fs.unlink(filePath, (err) => {
 		if (err) {
 			console.log(err);
@@ -51,7 +51,7 @@ export const deleteFilePost = (fileName) => {
 	})
 }
 
-export const saveFileDoc = (file,pathFile) => {
+export const saveFileDoc = (file, pathFile) => {
 	try {
 		const fileName = uuid.v4() + '.pdf';
 		const filePath = path.resolve(pathFile, fileName);
@@ -64,7 +64,7 @@ export const saveFileDoc = (file,pathFile) => {
 	}
 }
 
-export const deleteFileDoc = (fileName,pathFile) => {
+export const deleteFileDoc = (fileName, pathFile) => {
 	const filePath = path.resolve(pathFile, fileName);
 	fs.unlink(filePath, (err) => {
 		if (err) {

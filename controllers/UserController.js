@@ -3,7 +3,7 @@ import db from '../db/connect.js';
 
 export const createUser = async (req, res) => {
 	try {
-		const fileName = saveFile(req.files.image)
+		const fileName = saveFile(req.files.image,'static/users')
 		const { fullName, position, description } = req.body;
 		const newUser = await db.query(`INSERT INTO users ("fullName", "position", "description", "imageUrl") values ($1, $2, $3, $4) RETURNING *`, [fullName, position, description, fileName]);
 		const user = newUser.rows[0];
@@ -51,7 +51,7 @@ export const removeUsers = async (req, res) => {
 			}
 		}
 		if (user.imageUrl) {
-			deleteFile(user.imageUrl)
+			deleteFile(user.imageUrl,'static/users')
 		}
 		return [valid, res.json({
 			success: true,

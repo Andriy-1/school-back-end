@@ -43,3 +43,8 @@ create TABLE document_circle(
 	title VARCHAR(255) NOT NULL,
 	"file" VARCHAR(255) NOT NULL
 );
+
+create TABLE gallery(
+	id SERIAL PRIMARY KEY,
+	"file" VARCHAR(255) NOT NULL
+);
