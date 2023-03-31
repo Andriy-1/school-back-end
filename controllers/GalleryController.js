@@ -3,7 +3,7 @@ import db from '../db/connect.js';
 
 export const getAll = async (req, res) => {
 	try {
-		const newFile = await db.query(`SELECT * FROM gallery`);
+		const newFile = await db.query(`SELECT * FROM gallery;`);
 		res.json(newFile.rows.reverse());
 	} catch (err) {
 		console.log(err);
@@ -13,7 +13,24 @@ export const getAll = async (req, res) => {
 	}
 }
 
+// export const getNineItems = async (req, res) => {
+// 	try {
+// 		const numberCurrent = req.body.count;
+// 		const countFile = await db.query(`SELECT COUNT(*)/9 FROM gallery;`);
+// 		const newFile = await db.query(`SELECT * FROM gallery LIMIT 9 OFFSET 09*${numberCurrent};`);
+// 		const files = newFile.rows.reverse();
+// 		const count = countFile.rows;
+// 		res.json({ count, files });
+// 	} catch (err) {
+// 		console.log(err);
+// 		res.status(500).json({
+// 			message: 'Не вдалося отримати файл',
+// 		});
+// 	}
+// }
+
 export const create = async (req, res) => {
+	console.log(req.files);
 	try {
 		let file = [];
 		if (Array.isArray(req.files.file)) {
