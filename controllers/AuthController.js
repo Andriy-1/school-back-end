@@ -1,42 +1,53 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import db from '../db/connect.js';
+import * as dotenv from 'dotenv';
+dotenv.config()
+// import nodemailer from 'nodemailer';
+// const transporter = nodemailer.createTransport({
+// 	service: 'gmail',
+// 	auth: {
+// 		user: process.env.EMAIL,
+// 		pass: process.env.PASSWORD
 
-import AuthModel from '../models/Auth.js';
+// 	}
+// })
+// const mailOptions = {
+// 	from: 'Коп.Гімназія  <prob.robota@gmail.com>',
+// 	to: req.body.email,
+// 	subject: 'Код для авторизація на сайті школи',
+// 	html: '<h1>Код: 112233</h1>',
+// }
+// transporter.sendMail(mailOptions, err => console.log(err));
+
 
 export const register = async (req, res) => {
 	try {
-		const password = req.body.password;
-		const salt = await bcrypt.genSalt(10);
-		const hash = await bcrypt.hash(password, salt);
-		console.log(res.body);
+		const key = req.body.key;
+		if (key === process.env.KEY) {
+			const password = req.body.password;
+			const salt = await bcrypt.genSalt(10);
+			const hash = await bcrypt.hash(password, salt);
+			const { fullName, email } = req.body;
+			const newAuthUser = await db.query(`INSERT INTO auth ("fullName", email, "passwordHash") values ($1, $2, $3) RETURNING *`, [fullName, email, hash]);
+			const auth = newAuthUser.rows[0];
+			console.log(auth);
 
-		const doc = new AuthModel({
-			email: req.body.email,
-			fullName: req.body.fullName,
-			avatarUrl: req.body.avatarUrl,
-			passwordHash: hash,
-		});
-		console.log(doc);
-
-		const user = await doc.save();
-
-		const token = jwt.sign(
-			{
-				_id: user._id,
-			},
-			'secret123',
-			{
-				expiresIn: '30d',
-			},
-		);
-
-		const { passwordHash, ...userData } = user._doc;
-
-		res.json({
-			success: true,
-			...userData,
-			token
-		});
+			const token = jwt.sign(
+				{
+					_id: auth.id,
+				},
+				'secret123',
+				{
+					expiresIn: '5d',
+				},
+			);
+			res.json({ success: true, auth, token });
+		} else {
+			res.status(406).json({
+				message: 'Щось пішло не так. Перевірьте чи всі дані уведені вірно. Можливо якесь поле ненадане.',
+			})
+		}
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -47,16 +58,18 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
 	try {
-		// console.log('login back', req.body);
 
-		const user = await AuthModel.findOne({ email: req.body.email });
+		const resAuthData = await db.query(`SELECT * FROM auth WHERE email = $1`, [req.body.email]);
+		const user = resAuthData.rows[0];
+
+		console.log(user);
 
 		if (!user) {
 			return res.status(404).json({
 				message: 'Невірний логін або пароль',
 			});
 		}
-		const isValidPass = await bcrypt.compare(req.body.password, user._doc.passwordHash);
+		const isValidPass = await bcrypt.compare(req.body.password, user.passwordHash);
 
 		if (!isValidPass) {
 			return res.status(400).json({
@@ -66,18 +79,16 @@ export const login = async (req, res) => {
 
 		const token = jwt.sign(
 			{
-				_id: user._id,
+				_id: user.id,
 			},
 			'secret123',
 			{
-				expiresIn: '30d',
+				expiresIn: '5d',
 			},
 		);
 
-		const { passwordHash, ...userData } = user._doc;
-
 		res.json({
-			...userData,
+			...user,
 			token,
 		});
 	} catch (err) {
@@ -90,17 +101,15 @@ export const login = async (req, res) => {
 
 export const getMe = async (req, res) => {
 	try {
-		const user = await AuthModel.findById(req.userId);
-
-		if (!user) {
+		const allAuthUser = await db.query(`SELECT * FROM auth WHERE id = $1`, [req.userId]);
+		const auth = allAuthUser.rows[0];
+		console.log(auth);
+		if (!auth) {
 			return res.status(404).json({
 				message: 'Користувача не знайдено',
 			});
 		}
-
-		const { passwordHash, ...userData } = user._doc;
-
-		res.json(userData);
+		res.json(auth);
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
