@@ -3,7 +3,7 @@ import db from '../db/connect.js';
 
 export const createDoc = async (req, res) => {
 	try {
-		const fileName = saveFileDoc(req.files.file, 'static/doc/circle')
+		const fileName = await saveFileDoc(req.files.file, 'static/doc/circle')
 		const { title, seniors } = req.body;
 		const newFile = await db.query(`INSERT INTO document_circle ("title", "file") values ($1, $2) RETURNING *`, [title, fileName]);
 		const file = newFile.rows[0];
@@ -46,8 +46,9 @@ export const removeDoc = async (req, res) => {
 				});
 			}
 		}
-		if (document.file) {
-			deleteFileDoc(document.file, 'static/doc/circle')
+		if (document.file.length) {
+			document.file.map(item => deleteFileDoc(item, 'static/doc/circle'))
+
 		}
 		return [valid, res.json({
 			success: true,

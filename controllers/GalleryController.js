@@ -4,7 +4,9 @@ import db from '../db/connect.js';
 export const getAll = async (req, res) => {
 	try {
 		const newFile = await db.query(`SELECT * FROM gallery;`);
-		res.json(newFile.rows.reverse());
+		console.log('PHOTOS', Math.ceil(newFile.rowCount / 9));
+		
+		res.json({file: newFile.rows.reverse(), paginationCount:  Math.ceil(newFile.rowCount / 9)});
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -13,42 +15,27 @@ export const getAll = async (req, res) => {
 	}
 }
 
-// export const getNineItems = async (req, res) => {
-// 	try {
-// 		const numberCurrent = req.body.count;
-// 		const countFile = await db.query(`SELECT COUNT(*)/9 FROM gallery;`);
-// 		const newFile = await db.query(`SELECT * FROM gallery LIMIT 9 OFFSET 09*${numberCurrent};`);
-// 		const files = newFile.rows.reverse();
-// 		const count = countFile.rows;
-// 		res.json({ count, files });
-// 	} catch (err) {
-// 		console.log(err);
-// 		res.status(500).json({
-// 			message: 'Не вдалося отримати файл',
-// 		});
-// 	}
-// }
-
 export const create = async (req, res) => {
-	console.log(req.files);
 	try {
 		let file = [];
 		if (Array.isArray(req.files.file)) {
 			req.files.file.map(async (item, index) => {
-				const fileName = saveFile(item, 'static/gallery');
+				const fileName = await saveFile(item, 'static/gallery');
 				const newFile = await db.query(`INSERT INTO gallery ("file") values ($1) RETURNING *`, [fileName]);
 				console.log(newFile.rows[0]);
 				file.push(newFile.rows[0]);
 			})
 		} else {
-			const fileName = saveFile(req.files.file, 'static/gallery');
+			const fileName = await saveFile(req.files.file, 'static/gallery');
 			const newFile = await db.query(`INSERT INTO gallery ("file") values ($1) RETURNING *`, [fileName]);
 			file = newFile.rows[0];
 		}
-
-		return res.json({ success: true, ...file });
+		const newFile = await db.query(`SELECT * FROM gallery;`);
+		console.log('<-----Photo saved----->');
+		return res.json({file: newFile.rows.reverse(), paginationCount:  Math.ceil(newFile.rowCount / 9)});
+		
 	} catch (err) {
-		console.log(err);
+		console.log('<-----',err,'----->');
 		res.status(500).json({
 			message: 'Не вдалося створити файл',
 		});

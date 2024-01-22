@@ -1,20 +1,25 @@
 import * as uuid from 'uuid';
 import * as path from 'path';
 import fs from 'fs';
+import sharp from 'sharp';
 
 
-export const saveFile = (file, pathFile) => {
+export const saveFile = async (file, pathFile) => {
 	try {
-		const fileName = uuid.v4() + '.jpg';
-		const filePath = path.resolve(pathFile, fileName);
-		console.log(filePath);
-		file.mv(filePath);
-		return fileName;
+	  const fileName = uuid.v4() + '.webp';
+	  const filePath = path.resolve(pathFile, fileName);
+  
+	  const inputImageBuffer = file.data;
+	  const outputImageBuffer = await sharp(inputImageBuffer)
+		.webp({ quality: 75 })
+		.toBuffer(); 
+	  await fs.promises.writeFile(filePath, outputImageBuffer); 
+	  return fileName;
 	} catch (error) {
-		console.log(error);
-
+	  console.log(error);
+	  throw error;
 	}
-}
+  };
 
 export const deleteFile = (fileName, pathFile) => {
 	const filePath = path.resolve(pathFile, fileName);
@@ -27,12 +32,15 @@ export const deleteFile = (fileName, pathFile) => {
 	})
 }
 
-export const saveFilePost = (file) => {
+export const saveFilePost = async (file) => {
 	try {
-		const fileName = uuid.v4() + '.jpg';
+		const fileName = uuid.v4() + '.webp';
 		const filePath = path.resolve('static/posts', fileName);
-		console.log(filePath);
-		file.mv(filePath);
+		const inputImageBuffer = file.data;
+		const outputImageBuffer = await sharp(inputImageBuffer)
+		  .webp({ quality: 35 })
+		  .toBuffer(); 
+		await fs.promises.writeFile(filePath, outputImageBuffer); 
 		return fileName;
 	} catch (error) {
 		console.log(error);
@@ -51,16 +59,27 @@ export const deleteFilePost = (fileName) => {
 	})
 }
 
-export const saveFileDoc = (file, pathFile) => {
+export const saveFileDoc = async (file, pathFile) => {
+
 	try {
-		const fileName = uuid.v4() + '.pdf';
-		const filePath = path.resolve(pathFile, fileName);
-		console.log(filePath);
-		file.mv(filePath);
-		return fileName;
+		if (Array.isArray(file)) {
+			const fileNames = [];
+			for (let i = 0; i < file.length; i++) {
+				const element = file[i];
+				const fileName = uuid.v4() + '.pdf';
+				const filePath = path.resolve(pathFile, fileName);
+				await element.mv(filePath);
+				fileNames.push(fileName);
+			}
+			return fileNames;
+		} else {
+			const fileName = uuid.v4() + '.pdf';
+			const filePath = path.resolve(pathFile, fileName);
+			await file.mv(filePath);
+			return [fileName];
+		}
 	} catch (error) {
 		console.log(error);
-
 	}
 }
 

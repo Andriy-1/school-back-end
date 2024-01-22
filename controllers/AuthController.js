@@ -3,23 +3,6 @@ import bcrypt from 'bcrypt';
 import db from '../db/connect.js';
 import * as dotenv from 'dotenv';
 dotenv.config()
-// import nodemailer from 'nodemailer';
-// const transporter = nodemailer.createTransport({
-// 	service: 'gmail',
-// 	auth: {
-// 		user: process.env.EMAIL,
-// 		pass: process.env.PASSWORD
-
-// 	}
-// })
-// const mailOptions = {
-// 	from: 'Коп.Гімназія  <prob.robota@gmail.com>',
-// 	to: req.body.email,
-// 	subject: 'Код для авторизація на сайті школи',
-// 	html: '<h1>Код: 112233</h1>',
-// }
-// transporter.sendMail(mailOptions, err => console.log(err));
-
 
 export const register = async (req, res) => {
 	try {

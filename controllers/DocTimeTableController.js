@@ -3,9 +3,11 @@ import db from '../db/connect.js';
 
 export const createDoc = async (req, res) => {
 	try {
-		const fileName = saveFileDoc(req.files.file, 'static/doc/timeTable')
+		const fileName = await saveFileDoc(req.files.file, 'static/doc/timeTable')
 		const { title, seniors } = req.body;
-		const newFile = await db.query(`INSERT INTO document_timetable ("title", "file","seniors") values ($1, $2,$3) RETURNING *`, [title, fileName, seniors]);
+		console.log('fileName', fileName, seniors);
+
+		const newFile = await db.query(`INSERT INTO document_timetable ("title", "file","seniors") values ($1, $2, $3) RETURNING *`, [title, fileName, seniors]);
 		const file = newFile.rows[0];
 		res.json({ success: true, ...file });
 	} catch (err) {
@@ -46,8 +48,9 @@ export const removeDoc = async (req, res) => {
 				});
 			}
 		}
-		if (document.file) {
-			deleteFileDoc(document.file, 'static/doc/timeTable')
+		if (document.file.length) {
+			document.file.map(item => deleteFileDoc(item, 'static/doc/timeTable'))
+
 		}
 		return [valid, res.json({
 			success: true,

@@ -2,11 +2,6 @@ import { Router } from "express";
 import multer from "multer";
 import fs from 'fs';
 
-import { AuthController } from "../controllers/index.js";
-import { checkAuth, handleValidationErrors } from "../utils/index.js";
-import { loginValidation, registerValidation } from "../validations.js";
-// import { upload } from "../index.js";
-
 
 const uploadRouter = new Router;
 const storage = multer.diskStorage({

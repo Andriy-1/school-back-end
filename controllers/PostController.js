@@ -1,4 +1,3 @@
-import PostModel from '../models/Post.js';
 import db from '../db/connect.js';
 import { deleteFilePost, saveFilePost } from '../services/fileService.js';
 
@@ -25,49 +24,9 @@ export const getThree = async (req, res) => {
 		});
 	}
 };
-// export const getOne = async (req, res) => {
-// 	try {
-// 		const postId = req.params.id;
-
-// 		PostModel.findOneAndUpdate(
-// 			{
-// 				_id: postId,
-// 			},
-// 			{
-// 				$inc: { viewsCount: 1 },
-// 			},
-// 			{
-// 				returnDocument: 'after',
-// 			},
-// 			(err, doc) => {
-// 				if (err) {
-// 					console.log(err);
-// 					return res.status(500).json({
-// 						message: 'Не вдалося вернути статті',
-// 					});
-// 				}
-
-// 				if (!doc) {
-// 					return res.status(404).json({
-// 						message: 'Стаття не знайдена',
-// 					});
-// 				}
-
-// 				res.json(doc);
-// 			},
-// 		).populate('user');
-// 	} catch (err) {
-// 		console.log(err);
-// 		res.status(500).json({
-// 			message: 'Не вдалося отримати статті',
-// 		});
-// 	}
-// };
 
 export const remove = async (req, res) => {
 	try {
-
-
 		const postId = req.params.id;
 		const resPost = await db.query(`DELETE FROM posts WHERE id = $1 RETURNING *`, [postId]);
 		const post = resPost.rows[0];
@@ -104,7 +63,8 @@ export const remove = async (req, res) => {
 export const create = async (req, res) => {
 	try {
 		const { title, text, imageUrl } = req.body;
-		const fileName = saveFilePost(req.files.image)
+
+		const fileName = await saveFilePost(req.files.imageUrl);
 		console.log(fileName);
 
 		const newPost = await db.query(`INSERT INTO posts (title, text, "imageUrl", user_id) values ($1, $2, $3, $4) RETURNING *`, [title, text, fileName, req.userId]);
@@ -140,6 +100,37 @@ export const update = async (req, res) => {
 		console.log(err);
 		res.status(500).json({
 			message: 'Не вдалося обновити статтю',
+		});
+	}
+};
+
+export const updateLikeCount = async (req, res) => {
+	try {
+		const postId = req.params.id;
+		const {isLiked} = req.body;
+		const likePost = await db.query(`SELECT likecount FROM posts WHERE id = $1`, [postId]);
+		let currentLikes = 0;
+		let like = likePost.rows[0].likecount;
+		if (!isLiked) {
+			currentLikes = like + 1;
+		} else {
+				currentLikes = like - 1;
+		}
+		const upadateLikePost =
+			await db.query(`UPDATE posts 
+		SET likecount = $1
+		WHERE id = $2
+		RETURNING likecount`, [currentLikes, postId]);
+		const likecount = upadateLikePost.rows[0].likecount;
+
+		res.json({
+			success: true,
+			likecount
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({
+			message: 'Не вдалося обновити вподобання',
 		});
 	}
 };
