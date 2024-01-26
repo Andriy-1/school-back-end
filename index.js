@@ -26,15 +26,15 @@ app.use(express.json());
 app.use(fileUpload({}));
 app.use(compression());
 app.use(cors());
-// app.use(cors({
-//   origin: function (origin, callback) {
-//     if (allowedOrigins.includes(origin) || !origin) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Access denied by CORS'));
-//     }
-//   }
-// }));
+app.use(cors({
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Access denied by CORS'));
+    }
+  }
+}));
 
 app.use(express.static('static/users'));
 app.use(express.static('static/posts'));
