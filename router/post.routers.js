@@ -12,6 +12,7 @@ postRouter.post('/posts', checkAuth, postCreateValidation, handleValidationError
 postRouter.delete('/posts/:id', checkAuth, PostController.remove);
 postRouter.patch('/posts/:id', checkAuth, postCreateValidation, handleValidationErrors, PostController.update);
 postRouter.patch('/posts/likes/:id', PostController.updateLikeCount)
+postRouter.patch('/posts/views/:id', PostController.updateViewsCount)
 
 
 export default postRouter;

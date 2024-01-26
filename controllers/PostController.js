@@ -3,7 +3,7 @@ import { deleteFilePost, saveFilePost } from '../services/fileService.js';
 
 export const getAll = async (req, res) => {
 	try {
-		const resPosts = await db.query(`SELECT * FROM posts`);
+		const resPosts = await db.query(`SELECT * FROM posts ORDER BY id ASC`);
 		res.json(resPosts.rows.reverse());
 	} catch (err) {
 		console.log(err);
@@ -15,8 +15,8 @@ export const getAll = async (req, res) => {
 
 export const getThree = async (req, res) => {
 	try {
-		const posts = await db.query(`SELECT * FROM posts ORDER BY id LIMIT 3`);
-		res.json(posts.rows.reverse());
+		const posts = await db.query(`SELECT * FROM posts ORDER BY id DESC LIMIT 3`);
+		res.json(posts.rows);
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -126,6 +126,35 @@ export const updateLikeCount = async (req, res) => {
 		res.json({
 			success: true,
 			likecount
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({
+			message: 'Не вдалося обновити вподобання',
+		});
+	}
+};
+
+export const updateViewsCount = async (req, res) => {
+	try {
+		const postId = req.params.id;
+		const {isViews} = req.body;
+		const viewsPost = await db.query(`SELECT viewscount FROM posts WHERE id = $1`, [postId]);
+		let currentViews = 0;
+		let views = viewsPost.rows[0].viewscount;
+		if (!isViews) {
+			currentViews = views + 1;
+		}
+		const upadateViewsPost =
+			await db.query(`UPDATE posts 
+		SET viewscount = $1
+		WHERE id = $2
+		RETURNING viewscount`, [currentViews, postId]);
+		const viewscount = upadateViewsPost.rows[0].viewscount;
+
+		res.json({
+			success: true,
+			viewscount
 		});
 	} catch (err) {
 		console.log(err);
