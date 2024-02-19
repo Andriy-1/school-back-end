@@ -2,7 +2,7 @@ import Pool from "pg-pool";
 
 const pool = new Pool({
 	user: 'andriy',
-	password: '1223',
+	password: 12233221,
 	host: process.env.HOST,
 	port: 5432,
 	database: 'school-base'
