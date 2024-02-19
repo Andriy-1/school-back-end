@@ -32,7 +32,7 @@ export const create = async (req, res) => {
 		}
 		const newFile = await db.query(`SELECT * FROM gallery;`);
 		console.log('<-----Photo saved----->');
-		return res.json({file: newFile.rows.reverse(), paginationCount:  Math.ceil(newFile.rowCount / 9)});
+		return res.json({file: newFile.rows.reverse(), paginationCount:  Math.ceil(newFile.rowCount / 9),message: 'Фото завантажено до галереї'});
 		
 	} catch (err) {
 		console.log('<-----',err,'----->');

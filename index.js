@@ -25,7 +25,6 @@ const allowedOrigins = [
 app.use(express.json());
 app.use(fileUpload({}));
 app.use(compression());
-app.use(cors());
 app.use(cors({
   origin: function (origin, callback) {
     if (allowedOrigins.includes(origin) || !origin) {

@@ -1,11 +1,11 @@
 import Pool from "pg-pool";
 
 const pool = new Pool({
-	user: process.env.POSTGRES_USER,
-	password: process.env.POSTGRES_PASSWORD,
+	user: 'andriy',
+	password: '1223',
 	host: process.env.HOST,
 	port: 5432,
-	database: process.env.POSTGRES_DATABASE
+	database: 'school-base'
 })
 
 pool.connect(error => {

@@ -71,7 +71,10 @@ export const create = async (req, res) => {
 		const post = newPost.rows[0];
 		console.log(post);
 
-		res.json(post);
+		res.json({
+			post: post,
+			message: 'Карточку новин створено'
+		});
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -107,14 +110,14 @@ export const update = async (req, res) => {
 export const updateLikeCount = async (req, res) => {
 	try {
 		const postId = req.params.id;
-		const {isLiked} = req.body;
+		const { isLiked } = req.body;
 		const likePost = await db.query(`SELECT likecount FROM posts WHERE id = $1`, [postId]);
 		let currentLikes = 0;
 		let like = likePost.rows[0].likecount;
 		if (!isLiked) {
 			currentLikes = like + 1;
 		} else {
-				currentLikes = like - 1;
+			currentLikes = like - 1;
 		}
 		const upadateLikePost =
 			await db.query(`UPDATE posts 
@@ -138,7 +141,7 @@ export const updateLikeCount = async (req, res) => {
 export const updateViewsCount = async (req, res) => {
 	try {
 		const postId = req.params.id;
-		const {isViews} = req.body;
+		const { isViews } = req.body;
 		const viewsPost = await db.query(`SELECT viewscount FROM posts WHERE id = $1`, [postId]);
 		let currentViews = 0;
 		let views = viewsPost.rows[0].viewscount;
