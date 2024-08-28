@@ -14,6 +14,7 @@ import galleryRouter from './router/gallery.routers.js';
 
 const app = express();
 const allowedOrigins = [
+	'http://localhost:3000',
 	'http://192.168.88.208',
 	'https://192.168.88.208',
 	'https://kopachyntsi.if.ua',
