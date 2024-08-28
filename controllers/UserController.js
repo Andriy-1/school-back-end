@@ -18,7 +18,7 @@ export const createUser = async (req, res) => {
 };
 export const getAllUsers = async (req, res) => {
 	try {
-		const resUsers = await db.query(`SELECT * FROM users`);
+		const resUsers = await db.query(`SELECT * FROM users ORDER BY id ASC`);
 		res.json(resUsers.rows);
 	} catch (err) {
 		console.log(err);
