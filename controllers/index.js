@@ -1,7 +1,9 @@
 export * as AuthController from './AuthController.js';
 export * as PostController from './PostController.js';
+export * as PostCategoriesController from './PostCategoriesController.js';
 export * as UserController from './UserController.js';
 export * as DocController from './DocController.js';
+export * as DocCategoriesController from './DocCategoriesController.js';
 export * as DocTimeTableController from './DocTimeTableController.js';
 export * as DocCircleController from './DocCircleController.js';
 export * as GalleryController from './GalleryController.js';

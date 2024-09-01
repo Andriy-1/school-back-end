@@ -10,6 +10,8 @@ import docRouter from './router/document.routers.js';
 import docTimeTableRouter from './router/documentTimeTable.routers.js';
 import docCircleRouter from './router/documentCircle.routers.js';
 import galleryRouter from './router/gallery.routers.js';
+import docCategoriesRouter from './router/documentCategories.routers.js';
+import postCategoriesRouter from './router/postCategories.routers.js';
 
 
 const app = express();
@@ -45,8 +47,10 @@ app.use(express.static('static/gallery'));
 
 app.use('/api', authRouter);
 app.use('/api', postRouter);
+app.use('/api', postCategoriesRouter);
 app.use('/api', userRouter);
 app.use('/api', docRouter);
+app.use('/api', docCategoriesRouter);
 app.use('/api', docTimeTableRouter);
 app.use('/api', docCircleRouter);
 app.use('/api', galleryRouter);

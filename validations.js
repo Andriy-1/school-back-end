@@ -21,3 +21,7 @@ export const userCreateValidation = [
 	body('fullName', 'Введіть ПІБ').isLength({ min: 3 }).isString(),
 	body('position', 'Введіть посаду').isLength({ min: 3 }).isString(),
 ];
+
+export const postCategoriesCreateValidation = [
+	body('title', 'Введіть мінімум 3 символи').isLength({ min: 3 }).isString(),
+];

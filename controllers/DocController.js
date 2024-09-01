@@ -1,51 +1,6 @@
 import { deleteFileDoc, saveFileDoc } from '../services/fileService.js';
 import db from '../db/connect.js';
 
-export const createDoc = async (req, res) => {
-
-	try {
-		const fileName = await saveFileDoc(req.files.file, 'static/doc')
-		const { title, categories_id } = req.body;
-		let queryResult;
-
-		switch (categories_id) {
-			case '0':
-				await db.query(`INSERT INTO document ("title", "file", "categories_id") values ($1, $2, $3) RETURNING * `, [title, fileName, null]);
-				queryResult = await db.query(`SELECT * FROM document`);
-				res.json({
-					document: queryResult.rows.reverse(),
-					message: 'Документ додано',
-					success: true,
-				});
-				break;
-			default:
-				await db.query(`INSERT INTO document ("title", "file","categories_id") values ($1, $2, $3) RETURNING * `, [title, fileName, categories_id]);
-				if (categories_id > 0) {
-					queryResult = await db.query(`SELECT * FROM document WHERE categories_id = $1 `, [+categories_id]);
-					res.json({
-						document: queryResult.rows.reverse(),
-						message: 'Документ додано',
-						success: true,
-					});
-				} else {
-					const resDoc = await db.query(`SELECT * FROM document ORDER BY id ASC`);
-					res.json({
-						document: resDoc.rows.reverse(),
-						message: 'Документ додано',
-						success: true,
-					});
-				}
-				break;
-		}
-
-	} catch (err) {
-		console.log(err);
-		res.status(500).json({
-			message: 'Не вдалося створити файл',
-		});
-	}
-};
-
 export const getAllDoc = async (req, res) => {
 	try {
 		const categories_id = req.query.categories_id;
@@ -139,50 +94,44 @@ export const updateDoc = async (req, res) => {
 	}
 };
 
-export const getDocumentCategories = async (req, res) => {
-	try {
-		const resDocumentCategories = await db.query(`SELECT * FROM document_categories`);
-		res.json({
-			document_categories: resDocumentCategories.rows,
-		});
-	} catch (err) {
-		console.log(err);
-		res.status(500).json({
-			message: 'Не вдалося оновити дані',
-		});
-	}
-};
-
-export const removeDocumentCategories = async (req, res) => {
-	try {
-		const id = req.params.id;
-		const resDocumentCategories = await db.query(`DELETE FROM document_categories WHERE id = $1 RETURNING *`, [id]);
-		const categories = resDocumentCategories.rows[0];
-
-		console.log('resDocumentCategories', categories);
-
-		return res.json({
-			success: true,
-			message: 'Категорія видалена',
-		})
-	} catch (err) {
-		console.log(err);
-		res.status(500).json({
-			success: false,
-			message: 'Не можливо видалити категорію! У категорії знаходиться файл',
-		});
-	}
-};
-export const createDocumentCategories = async (req, res) => {
+export const createDoc = async (req, res) => {
 
 	try {
-		const { title } = req.body;
-		const newCategories = await db.query(`INSERT INTO document_categories ("title") values ($1) RETURNING *`, [title]);
-		res.json({
-			document_categories: newCategories.rows,
-			message: 'Категорію додано',
-			success: true,
-		});
+		console.log('req.files.file',req.files.file);
+		
+		const fileName = await saveFileDoc(req.files.file, 'static/doc')
+		const { title, categories_id } = req.body;
+		let queryResult;
+
+		switch (categories_id) {
+			case '0':
+				await db.query(`INSERT INTO document ("title", "file", "categories_id") values ($1, $2, $3) RETURNING * `, [title, fileName, null]);
+				queryResult = await db.query(`SELECT * FROM document`);
+				res.json({
+					document: queryResult.rows.reverse(),
+					message: 'Документ додано',
+					success: true,
+				});
+				break;
+			default:
+				await db.query(`INSERT INTO document ("title", "file","categories_id") values ($1, $2, $3) RETURNING * `, [title, fileName, categories_id]);
+				if (categories_id > 0) {
+					queryResult = await db.query(`SELECT * FROM document WHERE categories_id = $1 `, [+categories_id]);
+					res.json({
+						document: queryResult.rows.reverse(),
+						message: 'Документ додано',
+						success: true,
+					});
+				} else {
+					const resDoc = await db.query(`SELECT * FROM document ORDER BY id ASC`);
+					res.json({
+						document: resDoc.rows.reverse(),
+						message: 'Документ додано',
+						success: true,
+					});
+				}
+				break;
+		}
 
 	} catch (err) {
 		console.log(err);

@@ -4,7 +4,7 @@ import db from '../db/connect.js';
 export const getAll = async (req, res) => {
 	try {
 		const newFile = await db.query(`SELECT * FROM gallery;`);
-		console.log('PHOTOS', Math.ceil(newFile.rowCount / 9));
+		// console.log('PHOTOS', Math.ceil(newFile.rowCount / 9));
 		
 		res.json({file: newFile.rows.reverse(), paginationCount:  Math.ceil(newFile.rowCount / 9)});
 	} catch (err) {
