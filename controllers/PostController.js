@@ -1,8 +1,27 @@
 import db from '../db/connect.js';
 import { deleteFilePost, saveFilePost } from '../services/fileService.js';
 
+export const getFromCategoryAll = async (req, res) => {
+	try {
+		const categories_id = req.query.categories_id;
+		const queryResult = await db.query(`SELECT * FROM posts WHERE "postCategories_id" = $1 ORDER BY id ASC`, [+categories_id]);
+		if (queryResult.rowCount) {
+			res.json({ posts: queryResult.rows.reverse() });
+		}
+		res.json({
+			posts: queryResult.rows.reverse(),
+			message: 'У даній категорії немає новин',
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({
+			message: 'Не вдалося отримати статті',
+		});
+	}
+};
 export const getAll = async (req, res) => {
 	try {
+
 		const resPosts = await db.query(`SELECT * FROM posts ORDER BY id ASC`);
 		res.json(resPosts.rows.reverse());
 	} catch (err) {
@@ -11,12 +30,34 @@ export const getAll = async (req, res) => {
 			message: 'Не вдалося отримати статті',
 		});
 	}
-};
-
+}
 export const getThree = async (req, res) => {
 	try {
 		const posts = await db.query(`SELECT * FROM posts ORDER BY id DESC LIMIT 3`);
 		res.json(posts.rows);
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({
+			message: 'Не вдалося отримати статті',
+		});
+	}
+};
+
+export const getOne = async (req, res) => {
+	try {
+		const postId = req.params.id;
+		const resPost = await db.query(`SELECT * FROM posts WHERE id = $1`, [postId]);
+		const post = resPost.rows[0];
+		if (post) {
+			return res.json({
+				post: post,
+				success: true,
+			})
+		}
+		return res.status(404).json({
+			message: 'Статті не знайдено',
+		});
+
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -62,12 +103,13 @@ export const remove = async (req, res) => {
 
 export const create = async (req, res) => {
 	try {
-		const { title, text, imageUrl } = req.body;
+		const { title, text, postCategories_id, published = false } = req.body;
+
 
 		const fileName = await saveFilePost(req.files.imageUrl);
 		console.log(fileName);
 
-		const newPost = await db.query(`INSERT INTO posts (title, text, "imageUrl", user_id) values ($1, $2, $3, $4) RETURNING *`, [title, text, fileName, req.userId]);
+		const newPost = await db.query(`INSERT INTO posts (title, text, "imageUrl", user_id, "postCategories_id", published) values ($1, $2, $3, $4, $5, $6) RETURNING *`, [title, text, [fileName], req.userId, postCategories_id, published]);
 		const post = newPost.rows[0];
 		console.log(post);
 
