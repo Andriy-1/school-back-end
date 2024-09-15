@@ -6,7 +6,9 @@ import { postCreateValidation } from "../validations.js";
 
 const postRouter = new Router;
 
+postRouter.get('/posts-from-category', PostController.getFromCategoryAll);
 postRouter.get('/posts', PostController.getAll);
+postRouter.get('/posts/:id', PostController.getOne);
 postRouter.get('/posts/three', PostController.getThree);
 postRouter.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostController.create);
 postRouter.delete('/posts/:id', checkAuth, PostController.remove);
