@@ -5,13 +5,15 @@ export const getFromCategoryAll = async (req, res) => {
 	try {
 		const categories_id = req.query.categories_id;
 		const queryResult = await db.query(`SELECT * FROM posts WHERE "postCategories_id" = $1 ORDER BY id ASC`, [+categories_id]);
+		console.log(queryResult.rows.reverse(), categories_id);
 		if (queryResult.rowCount) {
 			res.json({ posts: queryResult.rows.reverse() });
+		} else {
+			res.json({
+				posts: queryResult.rows.reverse(),
+				message: 'У даній категорії немає новин',
+			});
 		}
-		res.json({
-			posts: queryResult.rows.reverse(),
-			message: 'У даній категорії немає новин',
-		});
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({
@@ -153,9 +155,9 @@ export const updateLikeCount = async (req, res) => {
 	try {
 		const postId = req.params.id;
 		const { isLiked } = req.body;
-		const likePost = await db.query(`SELECT likecount FROM posts WHERE id = $1`, [postId]);
+		const likePost = await db.query(`SELECT "likeCount" FROM posts WHERE id = $1`, [postId]);
 		let currentLikes = 0;
-		let like = likePost.rows[0].likecount;
+		let like = likePost.rows[0].likeCount;
 		if (!isLiked) {
 			currentLikes = like + 1;
 		} else {
@@ -163,14 +165,14 @@ export const updateLikeCount = async (req, res) => {
 		}
 		const upadateLikePost =
 			await db.query(`UPDATE posts 
-		SET likecount = $1
+		SET "likeCount" = $1
 		WHERE id = $2
-		RETURNING likecount`, [currentLikes, postId]);
-		const likecount = upadateLikePost.rows[0].likecount;
+		RETURNING "likeCount"`, [currentLikes, postId]);
+		const likeCount = upadateLikePost.rows[0].likeCount;
 
 		res.json({
 			success: true,
-			likecount
+			likeCount
 		});
 	} catch (err) {
 		console.log(err);
@@ -184,22 +186,22 @@ export const updateViewsCount = async (req, res) => {
 	try {
 		const postId = req.params.id;
 		const { isViews } = req.body;
-		const viewsPost = await db.query(`SELECT viewscount FROM posts WHERE id = $1`, [postId]);
+		const viewsPost = await db.query(`SELECT "viewsCount" FROM posts WHERE id = $1`, [postId]);
 		let currentViews = 0;
-		let views = viewsPost.rows[0].viewscount;
+		let views = viewsPost.rows[0].viewsCount;
 		if (!isViews) {
 			currentViews = views + 1;
 		}
 		const upadateViewsPost =
 			await db.query(`UPDATE posts 
-		SET viewscount = $1
+		SET "viewsCount" = $1
 		WHERE id = $2
-		RETURNING viewscount`, [currentViews, postId]);
-		const viewscount = upadateViewsPost.rows[0].viewscount;
+		RETURNING "viewsCount"`, [currentViews, postId]);
+		const viewsCount = upadateViewsPost.rows[0].viewsCount;
 
 		res.json({
 			success: true,
-			viewscount
+			viewsCount
 		});
 	} catch (err) {
 		console.log(err);
